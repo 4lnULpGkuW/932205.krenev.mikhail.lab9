@@ -1,12 +1,13 @@
 let pre = document.getElementById("previous");
 let act = document.getElementById("actual");
+let doted = false;
 
 function is_sign(char) {
-    return "+-*/".includes(char);
+    return char != "" && "+-*/".includes(char);
 }
 
 function is_num(char) {
-    return ".0123456789".includes(char);
+    return char != "" && ".0123456789".includes(char);
 }
 
 function act_to_prev(char) {
@@ -16,15 +17,40 @@ function act_to_prev(char) {
 
 function add_char(char) {
     if (is_num(char)) {
-        if (is_sign(act.innerText.slice(-1)) && act.innerText.slice(-1) != "-") {
+        if (!(is_sign(pre.innerText.slice(-1)) && act.innerText.slice(-1) == "-")) {
             pre.innerText += act.innerText;
             act.innerText = "";
+        }
+        else if (char == "." && !doted) {
+            doted = true;
+            if (act.innerText.length == 0 || act.innerText == "-") {
+                char = "0.";
+            }
+        }
+        else if (doted) { 
+            char = "";
         }
         act.innerText += char;
     }
     if (is_sign(char)) {
-        pre.innerText += act.innerText;
-        act.innerText = char;
+        if (((pre.innerText.length == 0 && act.innerText.length == 0) || is_sign(act.innerText.slice(-1))) && char == "-") {
+            act.innerText = char;
+        }
+        if (is_num(act.innerText.slice(-1))) {
+            pre.innerText += act.innerText;
+            act.innerText = char;
+        }
+        if (!is_sign(pre.innerText.slice(-1)) && is_sign(act.innerText.slice(-1))) {
+            if (act.innerText == "-") {
+                char = "-";
+            }
+            act.innerText = act.innerText.slice(0, -1);
+            act.innerText += char;
+        }
+        if (is_sign(pre.innerText.slice(-1)) && is_sign(act.innerText.slice(-1))) {
+            char = "";
+        }
+        doted = false;
     }
 }
 
@@ -37,10 +63,15 @@ function back() {
     act.innerText = act.innerText.slice(0, -1);
     if (act.innerText == "") {
         if (is_sign(pre.innerText.slice(-1))) {
+            act.innerText = pre.innerText.slice(-1);
             pre.innerText = pre.innerText.slice(0, -1);
         }
         else {
-            while (is_num(pre.innerText.slice(-1)) && pre.innerText != "") {
+            while (is_num(pre.innerText.slice(-1))) {
+                act.innerText = pre.innerText.slice(-1) + act.innerText;
+                pre.innerText = pre.innerText.slice(0, -1);
+            }
+            if ((pre.innerText.length == 1 || is_sign(pre.innerText.slice(-2, -1))) && pre.innerText.slice(-1) == "-") {
                 act.innerText = pre.innerText.slice(-1) + act.innerText;
                 pre.innerText = pre.innerText.slice(0, -1);
             }
@@ -49,6 +80,13 @@ function back() {
 }
 
 function calculate() {
-    act.innerText = eval(pre.innerText + act.innerText);
+    try {
+        act.innerText = eval(pre.innerText + act.innerText);
+    }
+    catch (err) {
+        if (err instanceof RangeError) {
+            act.innerText = "Error";
+        }
+    }
     pre.innerText = "";
 }
