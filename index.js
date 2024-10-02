@@ -17,9 +17,8 @@ function act_to_prev(char) {
 
 function add_char(char) {
     if (is_num(char)) {
-        if (!(is_sign(pre.innerText.slice(-1)) && act.innerText.slice(-1) == "-")) {
-            pre.innerText += act.innerText;
-            act.innerText = "";
+        if (is_num(act.innerText.slice(-1)) && char != ".") {
+            char = char;
         }
         else if (char == "." && !doted) {
             doted = true;
@@ -30,24 +29,29 @@ function add_char(char) {
         else if (doted) { 
             char = "";
         }
+        else if (!(is_sign(pre.innerText.slice(-1)) && act.innerText.slice(-1) == "-")) {
+            pre.innerText += act.innerText;
+            act.innerText = "";
+        }
         act.innerText += char;
     }
     if (is_sign(char)) {
-        if (((pre.innerText.length == 0 && act.innerText.length == 0) || is_sign(act.innerText.slice(-1))) && char == "-") {
-            act.innerText = char;
-        }
-        if (is_num(act.innerText.slice(-1))) {
+        if (is_sign(act.innerText.slice(-1)) && char == "-") {
             pre.innerText += act.innerText;
             act.innerText = char;
         }
-        if (!is_sign(pre.innerText.slice(-1)) && is_sign(act.innerText.slice(-1))) {
+        else if (!is_sign(act.innerText.slice(-1))) {
+            pre.innerText += act.innerText;
+            act.innerText = char;
+        }
+        else if (!is_sign(pre.innerText.slice(-1)) && is_sign(act.innerText.slice(-1))) {
             if (act.innerText == "-") {
                 char = "-";
             }
             act.innerText = act.innerText.slice(0, -1);
             act.innerText += char;
         }
-        if (is_sign(pre.innerText.slice(-1)) && is_sign(act.innerText.slice(-1))) {
+        else if (is_sign(pre.innerText.slice(-1)) && is_sign(act.innerText.slice(-1))) {
             char = "";
         }
         doted = false;
