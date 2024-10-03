@@ -36,7 +36,16 @@ function add_char(char) {
         act.innerText += char;
     }
     if (is_sign(char)) {
-        if (is_sign(act.innerText.slice(-1)) && char == "-") {
+        if (act.innerText.length == 0 && pre.innerText.length == 0 && char != "-") {
+            char == "";
+        }
+        else if (pre.innerText.length == 0 && act.innerText == "-") {
+            char == "";
+        }
+        else if (act.innerText.slice(-1) == "-" && char == "-"){
+            char = "";
+        }
+        else if (is_sign(act.innerText.slice(-1)) && char == "-") {
             pre.innerText += act.innerText;
             act.innerText = char;
         }
@@ -45,11 +54,10 @@ function add_char(char) {
             act.innerText = char;
         }
         else if (!is_sign(pre.innerText.slice(-1)) && is_sign(act.innerText.slice(-1))) {
-            if (act.innerText == "-") {
-                char = "-";
+            if (char != "-") {
+                act.innerText = act.innerText.slice(0, -1);
+                act.innerText += char;
             }
-            act.innerText = act.innerText.slice(0, -1);
-            act.innerText += char;
         }
         else if (is_sign(pre.innerText.slice(-1)) && is_sign(act.innerText.slice(-1))) {
             char = "";
@@ -88,9 +96,7 @@ function calculate() {
         act.innerText = eval(pre.innerText + act.innerText);
     }
     catch (err) {
-        if (err instanceof RangeError) {
-            act.innerText = "Error";
-        }
+        act.innerText = "Error";
     }
     pre.innerText = "";
 }
